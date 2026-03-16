@@ -43,15 +43,96 @@
 #         }
 
 #     return data
+
+# from groq import Groq
+# import json
+# import re
+# import os
+
+# client = Groq(
+#     api_key=os.getenv("GROQ_API_KEY")
+# )
+
+# def generate_ddr(text):
+
+#     text = text[:6000]
+
+#     prompt = """
+# Analyze the inspection report and return ONLY valid JSON.
+
+# Format exactly like this:
+
+# {
+#  "summary": "short summary",
+#  "observations":[
+#   {
+#    "area":"Area name",
+#    "description":"issue description",
+#    "root_cause":"possible root cause",
+#    "severity":"Low/Medium/High",
+#    "recommendation":"recommended action"
+#   }
+#  ]
+# }
+# """
+
+#     response = client.chat.completions.create(
+
+#         model="llama-3.1-8b-instant",
+
+#         messages=[
+#             {"role": "system", "content": prompt},
+#             {"role": "user", "content": text}
+#         ],
+
+#         temperature=0.2
+#     )
+
+#     content = response.choices[0].message.content
+
+#     # 🔧 Extract JSON safely
+#     match = re.search(r'\{.*\}', content, re.DOTALL)
+
+#     if match:
+#         json_text = match.group(0)
+#         return json.loads(json_text)
+
+#     # fallback if AI fails
+#     return {
+#         "summary": "Inspection completed but AI response parsing failed.",
+#         "observations": [
+#             {
+#                 "area": "General",
+#                 "description": "Inspection report processed successfully.",
+#                 "root_cause": "AI formatting issue",
+#                 "severity": "Low",
+#                 "recommendation": "Review report manually."
+#             }
+#         ]
+#     }
+
+
 from groq import Groq
 import json
 import re
+import os
+from dotenv import load_dotenv
 
-client = Groq(api_key="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")
+# load environment variables from .env
+load_dotenv()
+
+# get api key
+api_key = os.getenv("GROQ_API_KEY")
+
+if not api_key:
+    raise ValueError("❌ GROQ_API_KEY not found. Check your .env file.")
+
+client = Groq(api_key=api_key)
 
 
 def generate_ddr(text):
 
+    # limit text so model doesn't overload
     text = text[:6000]
 
     prompt = """
@@ -87,14 +168,18 @@ Format exactly like this:
 
     content = response.choices[0].message.content
 
-    # 🔧 Extract JSON safely
+    # extract json safely
     match = re.search(r'\{.*\}', content, re.DOTALL)
 
     if match:
         json_text = match.group(0)
-        return json.loads(json_text)
 
-    # fallback if AI fails
+        try:
+            return json.loads(json_text)
+        except:
+            pass
+
+    # fallback if AI formatting fails
     return {
         "summary": "Inspection completed but AI response parsing failed.",
         "observations": [
