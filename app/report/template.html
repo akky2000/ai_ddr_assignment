@@ -1,0 +1,91 @@
+<html>
+
+<head>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+padding:40px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+background:#1e293b;
+padding:40px;
+border-radius:10px;
+}
+
+h1{
+color:#38bdf8;
+text-align:center;
+}
+
+h2{
+color:#fbbf24;
+margin-top:20px;
+}
+
+img{
+width:450px;
+margin-top:10px;
+border-radius:6px;
+}
+
+.section{
+margin-top:25px;
+background:#0b1220;
+padding:20px;
+border-radius:8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Detailed Diagnostic Report</h1>
+
+<h2>Property Issue Summary</h2>
+
+<p>{{data.summary}}</p>
+
+<h2>Area-wise Observations</h2>
+
+{% for obs in observations %}
+
+<div class="section">
+
+<b>Area:</b> {{obs.area}} <br><br>
+
+<b>Observation:</b>
+<p>{{obs.description}}</p>
+
+{% for img in obs.images %}
+<img src="file:///{{img}}">
+{% endfor %}
+
+<b>Root Cause:</b>
+<p>{{obs.root_cause}}</p>
+
+<b>Severity:</b>
+<p>{{obs.severity}}</p>
+
+<b>Recommendation:</b>
+<p>{{obs.recommendation}}</p>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</body>
+
+</html>
