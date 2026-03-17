@@ -4,3 +4,5 @@ pymupdf
 openai
 jinja2
 python-multipart
+groq
+pdfkit
